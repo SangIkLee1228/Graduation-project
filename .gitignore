@@ -1,11 +1,19 @@
+# 원본 데이터 (대용량)
 data/Full_HotelRec.zip
-data/hotelrec_geo_186338.json
 data/HotelRec.txt
+data/hotelrec_geo_186338.json
+
+# 전처리 파이프라인 산출물 — 100MB 초과, 재생성 가능
+eda-alldata-output/*.parquet
+eda-alldata-output/*.jsonl
+eda-alldata-output/*.pkl
+eda-alldata-output/views/
+
+# 런던 추출 데이터 — 769 MB
+eda-london-output/london_reviews.json
+
+# Python 환경
 venv/
 __pycache__/
 *.pyc
-data/HotelRec.txt
-output/*.parquet
-output/*.jsonl
-output/*.png
 .ipynb_checkpoints/

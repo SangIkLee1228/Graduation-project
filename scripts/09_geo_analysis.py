@@ -6,11 +6,14 @@ TripAdvisor URL 구조:
     e.g. Hotel_Review-g194775-d1121769-Reviews-Hotel_Baltic-Giulianova_Province_of_Teramo_Abruzzo.html
 
 사용법:
-    python scripts/09_geo_analysis.py                 # output/views/hotels.parquet 사용 (빠름)
+    python scripts/09_geo_analysis.py                 # eda-alldata-output/views/hotels.parquet 사용 (빠름)
     python scripts/09_geo_analysis.py --full          # hotelrec_filtered.parquet 전체 (느림)
+    python scripts/09_geo_analysis.py --raw           # HotelRec.txt 원본 직접 사용 (매우 느림)
 """
 import argparse
+import json
 import re
+from collections import defaultdict
 from pathlib import Path
 
 import duckdb
@@ -18,6 +21,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from tqdm import tqdm
 
 # Windows Korean 폰트 설정
 matplotlib.rcParams["font.family"] = ["Malgun Gothic", "AppleGothic", "DejaVu Sans"]
@@ -26,6 +30,7 @@ matplotlib.rcParams["axes.unicode_minus"] = False
 ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "eda-alldata-output"
 VIEWS_DIR = OUT_DIR / "views"
+DATA_PATH = ROOT / "data" / "HotelRec.txt"
 
 GEO_RE = re.compile(r"-g(\d+)-")
 LOC_RE = re.compile(r"-([^-]+)\.html$")
@@ -34,6 +39,71 @@ LOC_RE = re.compile(r"-([^-]+)\.html$")
 # ──────────────────────────────────────────
 # 데이터 로드 & geo 집계
 # ──────────────────────────────────────────
+
+def _clean_line(line: str) -> str:
+    return line.strip().rstrip(",").strip("[]").strip()
+
+
+def load_from_raw(path: Path) -> pd.DataFrame:
+    """HotelRec.txt 전체를 스트리밍하며 geo_id 단위로 직접 집계합니다.
+    레코드 전체가 아닌 집계 딕셔너리만 메모리에 유지하므로 메모리 효율적입니다."""
+    file_size = path.stat().st_size
+    # geo_id → {n_reviews, hotels(set), rating_sum, location_slug}
+    geo_data: dict = defaultdict(lambda: {
+        "n_reviews": 0, "hotels": set(), "rating_sum": 0.0, "location_slug": None
+    })
+    n_err = 0
+
+    pbar = tqdm(total=file_size, unit="B", unit_scale=True,
+                unit_divisor=1024, desc="원본 로드 중", smoothing=0.1)
+    with path.open("r", encoding="utf-8") as f:
+        for raw in f:
+            pbar.update(len(raw.encode("utf-8")))
+            line = _clean_line(raw)
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except json.JSONDecodeError:
+                n_err += 1
+                continue
+
+            url = r.get("hotel_url") or ""
+            if not url:
+                continue
+            m_geo = GEO_RE.search(url)
+            if not m_geo:
+                continue
+            geo_id = m_geo.group(1)
+
+            g = geo_data[geo_id]
+            g["n_reviews"] += 1
+            g["hotels"].add(url)
+            rating = r.get("rating")
+            if isinstance(rating, (int, float)):
+                g["rating_sum"] += float(rating)
+            if g["location_slug"] is None:
+                m_loc = LOC_RE.search(url)
+                g["location_slug"] = m_loc.group(1) if m_loc else None
+    pbar.close()
+
+    if n_err:
+        print(f"  파싱 오류 {n_err:,}건 건너뜀")
+
+    rows = []
+    for geo_id, g in geo_data.items():
+        n_reviews = g["n_reviews"]
+        rows.append({
+            "geo_id": geo_id,
+            "location_slug": g["location_slug"],
+            "n_hotels": len(g["hotels"]),
+            "n_reviews": n_reviews,
+            "mean_rating": g["rating_sum"] / n_reviews if n_reviews else None,
+        })
+    geo = pd.DataFrame(rows)
+    geo["location_name"] = geo["location_slug"].fillna("").str.replace("_", " ", regex=False)
+    return geo
+
 
 def _extract(url: str):
     m_geo = GEO_RE.search(url)
@@ -172,19 +242,27 @@ def main():
     ap = argparse.ArgumentParser(description="HotelRec 지역 분포 분석")
     ap.add_argument("--full", action="store_true",
                     help="hotelrec_filtered.parquet 전체를 사용 (수 분 소요)")
+    ap.add_argument("--raw", action="store_true",
+                    help="HotelRec.txt 원본을 직접 사용 (매우 느림, 사전 처리 불필요)")
     args = ap.parse_args()
 
     hotels_path = VIEWS_DIR / "hotels.parquet"
     filtered_path = OUT_DIR / "hotelrec_filtered.parquet"
 
-    if not args.full and hotels_path.exists():
+    if args.raw:
+        if not DATA_PATH.exists():
+            print(f"❌ 데이터 파일 없음: {DATA_PATH}")
+            return
+        geo = load_from_raw(DATA_PATH)
+        src_label = "HotelRec.txt (전체 원본)"
+    elif not args.full and hotels_path.exists():
         geo = load_from_hotels_parquet(hotels_path)
         src_label = "hotels.parquet (k-core 필터 적용)"
     elif filtered_path.exists():
         geo = load_from_filtered_parquet(filtered_path)
         src_label = "hotelrec_filtered.parquet (전체 데이터)"
     else:
-        print("❌ 입력 파일 없음. 먼저 04_filter_parquet.py 또는 08_make_views.py를 실행하세요.")
+        print("❌ 입력 파일 없음. 먼저 04_filter_parquet.py 또는 08_make_views.py를 실행하거나 --raw 옵션을 사용하세요.")
         return
 
     geo = finalise(geo)

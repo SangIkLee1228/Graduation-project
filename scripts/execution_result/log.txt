@@ -81,3 +81,163 @@ dtype: object
 ✅ 저장: C:\Users\TWKIM\Graduation-project\eda-alldata-output\eda_sub_ratings.png
 
 📁 모든 결과: C:\Users\TWKIM\Graduation-project\eda-alldata-output
+
+C:\Users\TWKIM\Graduation-project>python scripts/09_geo_analysis.py --raw
+원본 로드 중: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████| 46.9G/46.9G [06:30<00:00, 129MB/s]
+   데이터 출처: HotelRec.txt (전체 원본)
+
+===========================================================================
+집계 결과 요약
+===========================================================================
+  고유 geo_id 수: 40,771
+  총 리뷰 수:    50,264,531
+  총 호텔 수:    365,057
+  CSV 저장:      C:\Users\TWKIM\Graduation-project\eda-alldata-output\geo_stats.csv
+
+===========================================================================
+  순위  지역명                                        호텔          리뷰      비중     평점
+===========================================================================
+   1  London England                          1,618     728,654   1.45%   3.97
+   2  New York City New York                    400     424,050   0.84%   4.15
+   3  Paris Ile de France                     1,673     355,825   0.71%   4.09
+   4  Bangkok                                 1,663     351,439   0.70%   4.22
+   5  Rome Lazio                              3,189     338,524   0.67%   4.21
+   6  Orlando Florida                           231     297,532   0.59%   4.08
+   7  Dubai Emirate of Dubai                    544     265,362   0.53%   4.38
+   8  Barcelona Catalonia                       988     211,518   0.42%   4.22
+   9  Amsterdam North Holland Province          664     197,186   0.39%   4.03
+  10  Istanbul                                1,736     183,666   0.37%   4.29
+  11  Cancun Yucatan Peninsula                  196     183,299   0.36%   4.22
+  12  Singapore                                 433     180,135   0.36%   4.02
+  13  Hong Kong                                 478     172,385   0.34%   4.16
+  14  Prague Bohemia                            865     160,728   0.32%   4.33
+  15  Blackpool Lancashire England              890     154,301   0.31%   4.25
+  16  Sydney New South Wales                    222     150,442   0.30%   3.99
+  17  Edinburgh Scotland                        526     150,417   0.30%   4.20
+  18  Marrakech Marrakech Tensift El Haou...  1,301     148,454   0.30%   4.45
+  19  Playa del Carmen Yucatan Peninsula        306     148,350   0.30%   4.29
+  20  Venice Veneto                             713     147,560   0.29%   4.28
+  21  Chicago Illinois                          159     146,636   0.29%   4.29
+  22  Melbourne Victoria                        223     141,616   0.28%   4.05
+  23  San Francisco California                  233     136,798   0.27%   4.02
+  24  Berlin                                    715     135,474   0.27%   4.18
+  25  Hanoi                                     788     133,780   0.27%   4.52
+  26  Siem Reap Siem Reap Province              753     133,174   0.26%   4.59
+  27  Dublin County Dublin                      278     127,456   0.25%   4.05
+  28  New Orleans Louisiana                     225     125,955   0.25%   4.27
+  29  Florence Tuscany                          904     125,865   0.25%   4.32
+  30  Punta Cana La Altagracia Province D...     71     120,357   0.24%   4.14
+===========================================================================
+
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-alldata-output\geo_top30_reviews.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-alldata-output\geo_top30_hotels.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-alldata-output\geo_rating_top20.png
+
+📁 모든 결과: C:\Users\TWKIM\Graduation-project\eda-alldata-output
+
+C:\Users\TWKIM\Graduation-project>python scripts/10_extract_london.py
+📍 런던(Greater London) geo_id 수: 46
+   포함 지역:
+     London England                                 728,654건
+     Hounslow Greater London England                 21,539건
+     West Drayton Greater London England             14,548건
+     Hayes Greater London England                    10,071건
+     Wembley Greater London England                   7,295건
+     Croydon Greater London England                   5,864건
+     Ilford Greater London England                    3,677건
+     Harrow Greater London England                    3,365건
+     Twickenham Greater London England                3,191건
+     Brentford Ealing Greater London England          3,015건
+     ... 외 36개 지역
+   예상 총 리뷰: 836,435건
+
+추출 중: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████| 46.9G/46.9G [06:21<00:00, 132MB/s]
+
+============================================================
+추출 완료
+============================================================
+전체 검사 레코드: 50,264,531
+파싱 오류:        0
+추출된 런던 리뷰: 836,435
+출력 크기:        769.8 MB
+저장 위치:        C:\Users\TWKIM\Graduation-project\eda-london-output\london_reviews.json
+
+로드 예시:
+  import json
+  with open(r'C:\Users\TWKIM\Graduation-project\eda-london-output\london_reviews.json', encoding='utf-8') as f:
+      data = json.load(f)  # list of dicts
+  print(len(data))  # 836,435
+
+C:\Users\TWKIM\Graduation-project>python scripts/11_london_eda.py    
+📂 입력: C:\Users\TWKIM\Graduation-project\eda-london-output\london_reviews.json
+📊 로드 완료: 836,435 리뷰 / 1,925 호텔
+
+============================================================
+기본 통계 (런던)
+============================================================
+평점 평균:      3.95
+평점 표준편차:  1.22
+텍스트 길이 평균:   660자
+텍스트 길이 중앙값: 486자
+
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_rating_dist.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_text_length.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_year_dist.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_sub_ratings.png
+C:\Users\TWKIM\Graduation-project\scripts\11_london_eda.py:157: UserWarning: Glyph 47532 (\N{HANGUL SYLLABLE RI}) missing from font(s) Arial.
+  plt.tight_layout()
+C:\Users\TWKIM\Graduation-project\scripts\11_london_eda.py:157: UserWarning: Glyph 48624 (\N{HANGUL SYLLABLE BYU}) missing from font(s) Arial.
+  plt.tight_layout()
+C:\Users\TWKIM\Graduation-project\scripts\11_london_eda.py:157: UserWarning: Glyph 49688 (\N{HANGUL SYLLABLE SU}) missing from font(s) Arial.
+  plt.tight_layout()
+C:\Users\TWKIM\Graduation-project\scripts\11_london_eda.py:159: UserWarning: Glyph 47532 (\N{HANGUL SYLLABLE RI}) missing from font(s) Arial.
+  plt.savefig(p, dpi=120)
+C:\Users\TWKIM\Graduation-project\scripts\11_london_eda.py:159: UserWarning: Glyph 48624 (\N{HANGUL SYLLABLE BYU}) missing from font(s) Arial.
+  plt.savefig(p, dpi=120)
+C:\Users\TWKIM\Graduation-project\scripts\11_london_eda.py:159: UserWarning: Glyph 49688 (\N{HANGUL SYLLABLE SU}) missing from font(s) Arial.
+  plt.savefig(p, dpi=120)
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_top_hotels.png
+
+📁 모든 결과: C:\Users\TWKIM\Graduation-project\eda-london-output
+
+C:\Users\TWKIM\Graduation-project>python scripts/11_london_eda.py
+📂 입력: C:\Users\TWKIM\Graduation-project\eda-london-output\london_reviews.json
+📊 로드 완료: 836,435 리뷰 / 1,925 호텔
+
+============================================================
+기본 통계 (런던)
+============================================================
+평점 평균:      3.95
+평점 표준편차:  1.22
+텍스트 길이 평균:   660자
+텍스트 길이 중앙값: 486자
+
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_rating_dist.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_text_length.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_year_dist.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_sub_ratings.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-output\london_eda_top_hotels.png
+
+📁 모든 결과: C:\Users\TWKIM\Graduation-project\eda-london-output
+
+C:\Users\TWKIM\Graduation-project>python scripts/12_g186338_eda.py
+📂 입력: C:\Users\TWKIM\Graduation-project\eda-london-output\london_reviews.json
+   전체 로드: 836,435건
+   g186338 필터링 후: 728,654건
+
+📊 g186338 통계
+============================================================
+리뷰 수:            728,654
+호텔 수:            1,618
+평점 평균:          3.97
+평점 표준편차:      1.21
+텍스트 길이 평균:   664자
+텍스트 길이 중앙값: 490자
+
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-g186338-output\g186338_eda_rating_dist.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-g186338-output\g186338_eda_text_length.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-g186338-output\g186338_eda_year_dist.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-g186338-output\g186338_eda_sub_ratings.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-london-g186338-output\g186338_eda_top_hotels.png
+
+📁 모든 결과: C:\Users\TWKIM\Graduation-project\eda-london-g186338-output
