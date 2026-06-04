@@ -4,8 +4,18 @@
 # 대용량 데이터 파일
 data/*.json
 data/*.txt
+data/*.zip
+data/Full_HotelRec.zip
+data/HotelRec.txt
+
+# Output 파일
+output/*.parquet
+output/*.jsonl
+output/*.png
 
 # Python
 __pycache__/
 *.pyc
 .venv/
+venv/
+.ipynb_checkpoints/
