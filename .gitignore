@@ -1,3 +1,11 @@
 data/Full_HotelRec.zip
 data/hotelrec_geo_186338.json
 data/HotelRec.txt
+venv/
+__pycache__/
+*.pyc
+data/HotelRec.txt
+output/*.parquet
+output/*.jsonl
+output/*.png
+.ipynb_checkpoints/
