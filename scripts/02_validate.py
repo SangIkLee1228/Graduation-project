@@ -17,7 +17,7 @@ from tqdm import tqdm
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / "data" / "HotelRec.txt"
-OUT_PATH = ROOT / "output" / "validation_stats.json"
+OUT_PATH = ROOT / "eda-alldata-output" / "validation_stats.json"
 
 
 def clean_line(line: str) -> str:

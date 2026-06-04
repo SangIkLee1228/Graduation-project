@@ -22,7 +22,7 @@ import duckdb
 
 ROOT = Path(__file__).resolve().parent.parent
 
-VIEWS_DIR = ROOT / "output" / "views"
+VIEWS_DIR = ROOT / "eda-alldata-output" / "views"
 
 
 def main():
@@ -37,8 +37,8 @@ def main():
         in_path = Path(args.input)
     else:
         candidates = [
-            ROOT / "output" / "hotelrec_kcore5.parquet",
-            ROOT / "output" / "hotelrec_normalized.parquet",
+            ROOT / "eda-alldata-output" / "hotelrec_kcore5.parquet",
+            ROOT / "eda-alldata-output" / "hotelrec_normalized.parquet",
         ]
         in_path = next((p for p in candidates if p.exists()), None)
 

@@ -1,0 +1,83 @@
+C:\Users\TWKIM\Graduation-project>python scripts/01_peek.py
+📂 파일: C:\Users\TWKIM\Graduation-project\data\HotelRec.txt
+📏 크기: 46.95 GB
+
+✅ 정상 파싱: 100건
+
+🔑 발견된 키: ['author', 'date', 'hotel_url', 'property_dict', 'rating', 'text', 'title'] 
+
+🏨 property_dict 서브키: ['cleanliness', 'location', 'rooms', 'service', 'sleep quality', 'value'] 
+
+📝 첫 레코드:
+{
+  "hotel_url": "Hotel_Review-g194775-d1121769-Reviews-Hotel_Baltic-Giulianova_Province_of_Teramo_Abruzzo.html",
+  "author": "violettaf340",
+  "date": "2019-01-01T00:00:00",
+  "rating": 5.0,
+  "title": "Xmas holiday",
+  "text": "We went here with our kids for Xmas holiday and we really liked it. Large options of food for breakfast and lunch , you can really taste the quality of the food in there. The surrounding area is nice and clean. Good experience. Hardly recommended .",
+  "property_dict": {}
+}
+
+C:\Users\TWKIM\Graduation-project>python scripts/02_validate.py
+검증 중: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████| 46.9G/46.9G [09:53<00:00, 84.9MB/s]
+
+============================================================
+검증 완료
+============================================================
+총 레코드:      50,264,531
+파싱 오류:      0
+빈 줄:          0
+고유 호텔(est): 365057
+고유 작성자(est): 1000000 (cap 1000000 도달, 실제 더 많을 수 있음)
+날짜 범위:      2001-02-01T00:00:00 ~ 2019-09-20T00:00:00
+평균 텍스트 길이: 691.1자 (min 2, max 63343)
+
+결측값 비율(%):
+  hotel_url      : 0.0%
+  author         : 0.0%
+  date           : 0.0%
+  rating         : 0.0%
+  title          : 0.001%
+  text           : 0.0%
+  property_dict  : 28.704%
+
+평점 분포:
+  1.0: 2,529,778
+  2.0: 2,543,289
+  3.0: 5,644,102
+  4.0: 13,437,531
+  5.0: 26,109,831
+
+📁 상세 결과: C:\Users\TWKIM\Graduation-project\eda-alldata-output\validation_stats.json
+
+C:\Users\TWKIM\Graduation-project>python scripts/05_eda.py --src raw
+📂 입력: C:\Users\TWKIM\Graduation-project\data\HotelRec.txt (전체 원본)
+원본 로드 중: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████| 46.9G/46.9G [07:10<00:00, 117MB/s]
+📊 로드 완료: 50,264,531 rows × 9 cols
+
+rating               float64
+text_len               int64
+date                  object
+sub_service          float64
+sub_cleanliness      float64
+sub_value            float64
+sub_location         float64
+sub_rooms            float64
+sub_sleep_quality    float64
+dtype: object 
+
+============================================================
+기본 통계
+============================================================
+평점 평균: 4.15
+평점 표준편차: 1.12
+텍스트 길이 평균: 691자
+텍스트 길이 중앙값: 476자
+
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-alldata-output\eda_rating_dist.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-alldata-output\eda_text_length.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-alldata-output\eda_year_dist.png
+✅ 저장: C:\Users\TWKIM\Graduation-project\eda-alldata-output\eda_sub_ratings.png
+
+📁 모든 결과: C:\Users\TWKIM\Graduation-project\eda-alldata-output
