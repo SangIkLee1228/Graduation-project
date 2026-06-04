@@ -1,0 +1,11 @@
+# API Keys - 절대 git에 올리지 않음
+.env
+
+# 대용량 데이터 파일
+data/*.json
+data/*.txt
+
+# Python
+__pycache__/
+*.pyc
+.venv/
