@@ -21,7 +21,7 @@ from tqdm import tqdm
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / "data" / "HotelRec.txt"
-OUT_PATH = ROOT / "output" / "hotelrec_filtered.parquet"
+OUT_PATH = ROOT / "eda-alldata-output" / "hotelrec_filtered.parquet"
 
 BATCH_SIZE = 200_000        # 이만큼 모이면 한 번 flush
 MIN_TEXT_LEN = 100

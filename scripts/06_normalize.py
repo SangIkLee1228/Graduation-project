@@ -21,8 +21,8 @@ from tqdm import tqdm
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / "data" / "HotelRec.txt"
-OUT_PARQUET = ROOT / "output" / "hotelrec_normalized.parquet"
-OUT_MAPS = ROOT / "output" / "id_maps.pkl"
+OUT_PARQUET = ROOT / "eda-alldata-output" / "hotelrec_normalized.parquet"
+OUT_MAPS = ROOT / "eda-alldata-output" / "id_maps.pkl"
 
 # --- 설정값 (필요에 맞게 조정) ---
 MIN_TEXT_LEN = 50          # 50자 미만 텍스트는 제거

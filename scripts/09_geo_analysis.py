@@ -24,7 +24,7 @@ matplotlib.rcParams["font.family"] = ["Malgun Gothic", "AppleGothic", "DejaVu Sa
 matplotlib.rcParams["axes.unicode_minus"] = False
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT_DIR = ROOT / "output"
+OUT_DIR = ROOT / "eda-alldata-output"
 VIEWS_DIR = OUT_DIR / "views"
 
 GEO_RE = re.compile(r"-g(\d+)-")

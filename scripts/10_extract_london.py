@@ -6,7 +6,7 @@
 
 사용법:
     python scripts/10_extract_london.py
-    python scripts/10_extract_london.py --out output/my_london.json
+    python scripts/10_extract_london.py --out eda-london-output/my_london.json
 """
 import argparse
 import json
@@ -18,7 +18,7 @@ from tqdm import tqdm
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / "data" / "HotelRec.txt"
-GEO_STATS = ROOT / "output" / "geo_stats.csv"
+GEO_STATS = ROOT / "eda-alldata-output" / "geo_stats.csv"
 
 GEO_RE = re.compile(r"-g(\d+)-")
 
@@ -47,7 +47,7 @@ def main():
         print("   먼저 scripts/09_geo_analysis.py를 실행하세요.")
         return
 
-    out_path = Path(args.out) if args.out else ROOT / "output" / "london_reviews.json"
+    out_path = Path(args.out) if args.out else ROOT / "eda-london-output" / "london_reviews.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     # 런던 geo_id 세트 구성

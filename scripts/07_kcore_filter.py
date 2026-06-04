@@ -17,7 +17,7 @@ from pathlib import Path
 import duckdb  # pip install duckdb
 
 ROOT = Path(__file__).resolve().parent.parent
-IN_PATH = ROOT / "output" / "hotelrec_normalized.parquet"
+IN_PATH = ROOT / "eda-alldata-output" / "hotelrec_normalized.parquet"
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
         print("   먼저 06_normalize.py를 실행하세요.")
         return
 
-    out_path = ROOT / "output" / f"hotelrec_kcore{args.k}.parquet"
+    out_path = ROOT / "eda-alldata-output" / f"hotelrec_kcore{args.k}.parquet"
     con = duckdb.connect()
 
     # 초기 카운트

@@ -73,7 +73,7 @@ def main():
         print(f"❌ 파일 없음: {DATA_PATH}")
         return
 
-    out_path = Path(args.out) if args.out else ROOT / "output" / f"sample_{args.k}.jsonl"
+    out_path = Path(args.out) if args.out else ROOT / "eda-alldata-output" / f"sample_{args.k}.jsonl"
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"📂 입력: {DATA_PATH}")

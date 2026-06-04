@@ -1,0 +1,57 @@
+{
+  "total": 50264531,
+  "parse_error": 0,
+  "empty_lines": 0,
+  "missing": {
+    "hotel_url": 0,
+    "author": 0,
+    "date": 0,
+    "rating": 0,
+    "title": 609,
+    "text": 3,
+    "property_dict": 14428117
+  },
+  "rating_dist": {
+    "1.0": 2529778,
+    "2.0": 2543289,
+    "3.0": 5644102,
+    "4.0": 13437531,
+    "5.0": 26109831
+  },
+  "prop_key_freq": {
+    "service": 35573443,
+    "cleanliness": 26406100,
+    "value": 26386737,
+    "location": 25521473,
+    "rooms": 25416751,
+    "sleep quality": 22592252,
+    "check in / front desk": 980094,
+    "business service (e.g., internet access)": 605677,
+    "ur_question.prompt.11": 205,
+    "userrating.prompt.190": 173,
+    "userrating.prompt.46": 8,
+    "userrating.prompt.48": 6
+  },
+  "text_length": {
+    "min": 2,
+    "max": 63343,
+    "sum": 34738273357,
+    "count": 50264528,
+    "avg": 691.1091129115945
+  },
+  "date_range": {
+    "min": "2001-02-01T00:00:00",
+    "max": "2019-09-20T00:00:00"
+  },
+  "unique_hotels_estimate": 365057,
+  "unique_authors_estimate": "1000000 (cap 1000000 도달, 실제 더 많을 수 있음)",
+  "missing_ratio_pct": {
+    "hotel_url": 0.0,
+    "author": 0.0,
+    "date": 0.0,
+    "rating": 0.0,
+    "title": 0.001,
+    "text": 0.0,
+    "property_dict": 28.704
+  }
+}
