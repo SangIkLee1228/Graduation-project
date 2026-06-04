@@ -3,6 +3,7 @@
 
 # 대용량 데이터 파일
 data/*.json
+!data/hotel_profiles.json
 data/*.txt
 data/*.zip
 data/Full_HotelRec.zip
