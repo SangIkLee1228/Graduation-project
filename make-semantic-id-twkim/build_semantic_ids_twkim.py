@@ -3,7 +3,7 @@
 : hotel_profiles.json의 profile 텍스트를 임베딩 후
   3-level Residual Quantization으로 계층적 discrete ID 부여
 
-출력: make-semantic-id/hotel_semantic_ids.json
+출력: make-semantic-id-twkim/hotel_semantic_ids_twkim.json
 """
 
 import json
@@ -13,7 +13,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
 
 PROFILES_PATH = "data/hotel_profiles.json"
-OUTPUT_PATH   = "make-semantic-id/hotel_semantic_ids.json"
+OUTPUT_PATH   = "make-semantic-id-twkim/hotel_semantic_ids_twkim.json"
 
 K      = 16   # codebook 크기 (각 level마다)
 LEVELS = 3    # RQ depth
