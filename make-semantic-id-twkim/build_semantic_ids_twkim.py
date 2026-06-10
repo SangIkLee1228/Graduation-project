@@ -35,7 +35,7 @@ def residual_quantize(embeddings: np.ndarray, k: int, levels: int):
         codes.append(c)
         centroids_list.append(centroids)
 
-    return codes, centroids_list
+    return codes, centroids_list, residual
 
 
 def main():
@@ -52,11 +52,24 @@ def main():
     print(f"임베딩 shape: {embeddings.shape}")
 
     print("Residual Quantization 수행 중...")
-    codes, _ = residual_quantize(embeddings, K, LEVELS)
+    codes, _, final_residual = residual_quantize(embeddings, K, LEVELS)
+
+    # Local Rank: 같은 [c1,c2,c3]를 공유하는 그룹 내에서 최종 잔차 L2 norm 오름차순 순위
+    from collections import defaultdict
+    group_indices = defaultdict(list)
+    for i in range(len(keys)):
+        sid_tuple = tuple(int(codes[lvl][i]) for lvl in range(LEVELS))
+        group_indices[sid_tuple].append(i)
+
+    local_ranks = np.zeros(len(keys), dtype=int)
+    norms = np.linalg.norm(final_residual, axis=1)
+    for indices in group_indices.values():
+        for rank, i in enumerate(sorted(indices, key=lambda x: norms[x])):
+            local_ranks[i] = rank
 
     results = {}
     for i, key in enumerate(keys):
-        sid = [int(codes[lvl][i]) for lvl in range(LEVELS)]
+        sid = [int(codes[lvl][i]) for lvl in range(LEVELS)] + [int(local_ranks[i])]
         results[key] = {
             "hotel_id":       hotel_profiles[key]["hotel_id"],
             "hotel_name":     hotel_profiles[key]["hotel_name"],
