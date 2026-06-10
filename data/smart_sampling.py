@@ -8,8 +8,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 # ── 설정 ──────────────────────────────────────────────────────────
-DATA_PATH   = "C:/Users/SANGIK/Downloads/Full_HotelRec/hotelrec_geo_186338.json"
-OUTPUT_PATH = "C:/Users/SANGIK/Graduation-project/data/hotel_sampled_reviews.json"
+DATA_PATH   = "data/hotelrec_geo_186338.json"
+OUTPUT_PATH = "data/hotel_sampled_reviews.json"
 
 TOTAL_SAMPLE    = 20        # 호텔당 최종 샘플 수
 PRIMARY_YEARS   = 3         # 1차 기간 (최근 N년)
