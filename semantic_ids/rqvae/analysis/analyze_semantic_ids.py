@@ -2,13 +2,19 @@
 Semantic ID 분포 및 계층성 분석/시각화
 """
 
+from pathlib import Path
+
 import json
 from collections import Counter
 import matplotlib.pyplot as plt
 
-SEM_ID_PATH = "C:/Users/SANGIK/Graduation-project/data/hotel_semantic_ids.json"
-PROFILE_PATH = "C:/Users/SANGIK/Graduation-project/data/hotel_profiles.json"
-OUT_DIR = "C:/Users/SANGIK/Graduation-project/data/"
+ROOT = Path(__file__).resolve().parents[3]
+ARTIFACTS_DIR = ROOT / "semantic_ids/rqvae/artifacts"
+ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+
+SEM_ID_PATH = ARTIFACTS_DIR / "hotel_semantic_ids.json"
+PROFILE_PATH = ROOT / "data/hotel_profiles.json"
+OUT_DIR = ROOT / "semantic_ids/rqvae/analysis"
 
 with open(SEM_ID_PATH, encoding="utf-8") as f:
     sem_ids = json.load(f)
@@ -32,7 +38,7 @@ for ax, codes, title in zip(axes, [c1_list, c2_list, c3_list], ["c1", "c2", "c3"
     ax.set_xlabel("code rank")
     ax.set_ylabel("count")
 plt.tight_layout()
-plt.savefig(OUT_DIR + "codebook_distribution.png", dpi=120)
+plt.savefig(OUT_DIR / "codebook_distribution.png", dpi=120)
 plt.close()
 print("저장: codebook_distribution.png")
 
@@ -81,6 +87,6 @@ ax.set_title(f"(c1,c2) group size distribution\n({len(pair_counter)} unique pair
 ax.set_xlabel("group rank")
 ax.set_ylabel("hotel count")
 plt.tight_layout()
-plt.savefig(OUT_DIR + "c1c2_group_sizes.png", dpi=120)
+plt.savefig(OUT_DIR / "c1c2_group_sizes.png", dpi=120)
 plt.close()
 print("저장: c1c2_group_sizes.png")

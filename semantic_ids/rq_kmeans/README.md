@@ -103,7 +103,7 @@ c4 = 1  →  두 번째
 
 ```bash
 # 프로젝트 루트에서 실행
-python make-semantic-id-twkim/build_semantic_ids_twkim.py
+python semantic_ids/rq_kmeans/build_semantic_ids_twkim.py
 ```
 
 의존성: `sentence-transformers`, `scikit-learn`, `numpy` (`requirements.txt` 참고)

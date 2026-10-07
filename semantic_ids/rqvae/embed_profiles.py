@@ -2,13 +2,19 @@
 호텔 프로파일 텍스트 -> Sentence-T5 임베딩
 """
 
+from pathlib import Path
+
 import json
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-INPUT_PATH  = "C:/Users/SANGIK/Graduation-project/data/hotel_profiles.json"
-OUTPUT_EMB_PATH  = "C:/Users/SANGIK/Graduation-project/data/hotel_embeddings.npy"
-OUTPUT_IDS_PATH  = "C:/Users/SANGIK/Graduation-project/data/hotel_embedding_ids.json"
+ROOT = Path(__file__).resolve().parents[2]
+ARTIFACTS_DIR = ROOT / "semantic_ids/rqvae/artifacts"
+ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+
+INPUT_PATH  = ROOT / "data/hotel_profiles.json"
+OUTPUT_EMB_PATH  = ARTIFACTS_DIR / "hotel_embeddings.npy"
+OUTPUT_IDS_PATH  = ARTIFACTS_DIR / "hotel_embedding_ids.json"
 
 MODEL_NAME = "sentence-t5-base"
 

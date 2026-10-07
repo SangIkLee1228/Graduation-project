@@ -20,9 +20,11 @@ import seaborn as sns
 sns.set_theme(style="whitegrid", font_scale=1.05)
 PALETTE16 = sns.color_palette("tab20", 16)
 
-SIDS_PATH     = "make-semantic-id-twkim/hotel_semantic_ids_twkim.json"
-PROFILES_PATH = "data/hotel_profiles.json"
-OUT_DIR       = Path("make-semantic-id-twkim/analysis")
+ROOT = Path(__file__).resolve().parents[3]
+
+SIDS_PATH     = ROOT / "semantic_ids/rq_kmeans/artifacts/hotel_semantic_ids_twkim.json"
+PROFILES_PATH = ROOT / "data/hotel_profiles.json"
+OUT_DIR       = ROOT / "semantic_ids/rq_kmeans/analysis"
 DPI           = 300
 
 STOPWORDS = {

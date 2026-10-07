@@ -1,13 +1,13 @@
 """
 Semantic ID 성질 분석 및 시각화
-: make-semantic-id-twkim/hotel_semantic_ids_twkim.json 기반
+: semantic_ids/rq_kmeans/artifacts/hotel_semantic_ids_twkim.json 기반
 
 생성 파일 (analysis/ 폴더):
   fig1_l1_distribution.png   - L1 클러스터별 호텔 수
   fig2_l1_avg_rating.png     - L1 클러스터별 평균 평점 ± std
   fig3_l1_rating_boxplot.png - L1 클러스터별 평점 분포 (box plot)
   fig4_l1l2_heatmap.png      - L1×L2 co-occurrence heatmap
-  fig5_id_uniqueness.png     - 전체 ID [c1,c2,c3] 고유성 분석
+  fig5_id_uniqueness.png     - 전체 ID [c1,c2,c3,c4] 고유성 분석
   fig6_tsne.png              - t-SNE 2D projection (L1 색상)
 """
 
@@ -22,9 +22,11 @@ from pathlib import Path
 sns.set_theme(style="whitegrid", font_scale=1.1)
 PALETTE = sns.color_palette("tab20", 16)
 
-SIDS_PATH     = "make-semantic-id-twkim/hotel_semantic_ids_twkim.json"
-PROFILES_PATH = "data/hotel_profiles.json"
-OUT_DIR       = Path("make-semantic-id-twkim/analysis")
+ROOT = Path(__file__).resolve().parents[3]
+
+SIDS_PATH     = ROOT / "semantic_ids/rq_kmeans/artifacts/hotel_semantic_ids_twkim.json"
+PROFILES_PATH = ROOT / "data/hotel_profiles.json"
+OUT_DIR       = ROOT / "semantic_ids/rq_kmeans/analysis"
 DPI           = 300
 
 
@@ -181,9 +183,9 @@ def fig5_id_uniqueness(rows):
         autopct="%1.1f%%", startangle=140,
         textprops={"fontsize": 11},
     )
-    ax2.set_title(f"ID Uniqueness\n(Total distinct IDs: {total_ids} / 4,096)")
+    ax2.set_title(f"ID Uniqueness\n(Total distinct IDs: {total_ids} / {len(rows)} hotels)")
 
-    fig.suptitle("Fig 5. Full Semantic ID [c1-c2-c3] Uniqueness Analysis", fontsize=13)
+    fig.suptitle("Fig 5. Full Semantic ID [c1-c2-c3-c4] Uniqueness Analysis", fontsize=13)
     fig.tight_layout()
     fig.savefig(OUT_DIR / "fig5_id_uniqueness.png", dpi=DPI)
     plt.close(fig)

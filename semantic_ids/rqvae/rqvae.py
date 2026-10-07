@@ -3,6 +3,8 @@ RQ-VAE (Residual Quantization VAE) - TIGER 방식 Semantic ID 생성
 hotel_embeddings.npy (1619, 768) -> Semantic ID (c1, c2, c3) per hotel
 """
 
+from pathlib import Path
+
 import json
 import numpy as np
 import torch
@@ -11,10 +13,14 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
 
 # ── 설정 ──────────────────────────────────────────────────────────
-EMB_PATH    = "C:/Users/SANGIK/Graduation-project/data/hotel_embeddings.npy"
-IDS_PATH    = "C:/Users/SANGIK/Graduation-project/data/hotel_embedding_ids.json"
-OUTPUT_PATH = "C:/Users/SANGIK/Graduation-project/data/hotel_semantic_ids.json"
-CKPT_PATH   = "C:/Users/SANGIK/Graduation-project/data/rqvae.pt"
+ROOT = Path(__file__).resolve().parents[2]
+ARTIFACTS_DIR = ROOT / "semantic_ids/rqvae/artifacts"
+ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+
+EMB_PATH    = ARTIFACTS_DIR / "hotel_embeddings.npy"
+IDS_PATH    = ARTIFACTS_DIR / "hotel_embedding_ids.json"
+OUTPUT_PATH = ARTIFACTS_DIR / "hotel_semantic_ids.json"
+CKPT_PATH   = ARTIFACTS_DIR / "rqvae.pt"
 
 INPUT_DIM    = 768
 LATENT_DIM   = 32

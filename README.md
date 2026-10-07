@@ -15,7 +15,10 @@ Graduation-project/
 ├── eda-alldata-output/            # 전체 데이터 EDA 결과물
 ├── eda-london-output/             # 런던 전체(46 geo_id) EDA 결과물
 ├── eda-london-g186338-output/     # 런던 중심부(g186338 단독) EDA 결과물
-├── make-semantic-id/              # Semantic ID 생성 (작업 예정)
+├── semantic_ids/                  # 구현 완료된 Semantic ID 두 방식
+│   ├── rq_kmeans/                 # MiniLM + K-means RQ
+│   └── rqvae/                     # Sentence-T5 + RQ-VAE
+├── docs/                          # 평가 및 후속 실험 계획
 ├── requirements.txt               # Python 패키지 목록
 └── README.md
 ```
@@ -216,3 +219,14 @@ python scripts/10_extract_london.py
 python scripts/11_london_eda.py
 python scripts/12_g186338_eda.py
 ```
+
+
+## Semantic ID 구현 및 다음 단계
+
+두 방식 모두 동일한 1,619개 호텔에 대해 4토큰 고유 ID를 생성했다.
+각 방식의 코드, 분석 그래프, 산출물은 `semantic_ids/` 아래에 분리해 보관한다.
+
+- [Semantic ID 실행 및 산출물](semantic_ids/README.md)
+- [평가 메트릭 및 BM25·SASRec·BERT4Rec 실험 계획](docs/EXPERIMENT_PLAN.md)
+
+추천 모델 학습과 추천 성능 비교는 아직 수행하지 않았다.
