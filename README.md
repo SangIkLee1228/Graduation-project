@@ -10,16 +10,23 @@ TIGER 등에서 제안된 Semantic ID 방식과 관계형 DB 기반 추천 기�
 
 ```
 Graduation-project/
-├── data/                          # 원본 데이터 및 초기 처리 스크립트
-├── scripts/                       # 전처리 · EDA 파이프라인 (01~12번)
-├── eda-alldata-output/            # 전체 데이터 EDA 결과물
-├── eda-london-output/             # 런던 전체(46 geo_id) EDA 결과물
-├── eda-london-g186338-output/     # 런던 중심부(g186338 단독) EDA 결과물
-├── semantic_ids/                  # 구현 완료된 Semantic ID 두 방식
-│   ├── rq_kmeans/                 # MiniLM + K-means RQ
-│   └── rqvae/                     # Sentence-T5 + RQ-VAE
-├── docs/                          # 평가 및 후속 실험 계획
-├── requirements.txt               # Python 패키지 목록
+├── scripts/                       # 기존 스크립트: 처리 로직 유지
+│   ├── preprocessing/             # 전처리·샘플링·데이터 분할
+│   ├── profiles/                  # LLM 호텔 프로파일 생성
+│   ├── semantic_ids/              # K-means RQ / RQ-VAE 생성 코드
+│   └── analysis/                  # EDA / Semantic ID 분석 코드
+├── data/
+│   ├── raw/                       # 대용량 원본 (Git 제외)
+│   ├── processed/                 # 정제 데이터·호텔 프로파일
+│   └── splits/                    # 학습·검증·테스트 및 기존 용도별 뷰
+├── artifacts/semantic_ids/        # 두 방식의 ID·임베딩·체크포인트
+├── reports/
+│   ├── eda/                       # all / london / london_core
+│   ├── semantic_ids/              # rq_kmeans / rqvae 분석 그림
+│   └── preprocessing/logs/        # 기존 실행 기록
+├── docs/                          # 전처리·Semantic ID·후속 실험 문서
+├── archives/                      # 기존 scripts/files.zip 보관
+├── requirements.txt
 └── README.md
 ```
 
@@ -29,9 +36,9 @@ Graduation-project/
 
 | 파일 | 크기 | 설명 |
 |------|------|------|
-| `data/HotelRec.txt` | 47 GB | HotelRec 전체 리뷰 데이터 (50,264,531건). JSON 배열 형식. git 미포함 |
-| `data/Full_HotelRec.zip` | 14 GB | 위 파일의 압축본. git 미포함 |
-| `data/hotelrec_geo_186338.json` | 673 MB | g186338 (London England) 에 해당하는 리뷰만 사전 추출한 파일. git 미포함 |
+| `data/raw/HotelRec.txt` | 47 GB | HotelRec 전체 리뷰 데이터 (50,264,531건). JSON 배열 형식. git 미포함 |
+| `data/raw/Full_HotelRec.zip` | 14 GB | 위 파일의 압축본. git 미포함 |
+| `data/raw/hotelrec_geo_186338.json` | 673 MB | g186338 (London England) 에 해당하는 리뷰만 사전 추출한 파일. git 미포함 |
 
 ### 레코드 구조
 
@@ -62,13 +69,13 @@ Graduation-project/
 
 ---
 
-## data/ 폴더 상세
+## 프로파일 생성 및 데이터
 
 | 파일 | 설명 |
 |------|------|
-| `smart_sampling.py` | 호텔별 리뷰를 최대 20개로 스마트 샘플링. 최신 리뷰 우선 + 평점 구간별 균등 샘플링(1점 2개, 2점 2개, 3점 4개, 4점 6개, 5점 6개). 입력: `hotelrec_geo_186338.json` |
-| `generate_profiles.py` | 샘플링된 리뷰 20개를 LLM(GPT-4o-mini)에 전달해 호텔별 3문장 프로파일 생성. Luxia Cloud API 사용. `.env`에 `LUXIA_API_KEY` 필요 |
-| `hotel_profiles.json` | `generate_profiles.py` 출력. 호텔 URL → `{hotel_id, hotel_name, avg_rating, profile(3문장 텍스트)}` 매핑 |
+| `scripts/preprocessing/smart_sampling.py` | 호텔별 리뷰를 최대 20개로 스마트 샘플링. 최신 리뷰 우선 + 평점 구간별 균등 샘플링(1점 2개, 2점 2개, 3점 4개, 4점 6개, 5점 6개). 입력: `hotelrec_geo_186338.json` |
+| `scripts/profiles/generate_profiles.py` | 샘플링된 리뷰 20개를 LLM(GPT-4o-mini)에 전달해 호텔별 3문장 프로파일 생성. Luxia Cloud API 사용. `.env`에 `LUXIA_API_KEY` 필요 |
+| `data/processed/hotel_profiles.json` | `generate_profiles.py` 출력. 호텔 URL → `{hotel_id, hotel_name, avg_rating, profile(3문장 텍스트)}` 매핑 |
 
 ### hotel_profiles.json 구조
 
@@ -90,7 +97,7 @@ Graduation-project/
 
 ## scripts/ 폴더 상세
 
-전처리·EDA 파이프라인이 번호 순서대로 구성돼 있습니다. 자세한 내용은 **[scripts/README.md](scripts/README.md)** 를 참고하세요.
+전처리·EDA 파이프라인이 번호 순서대로 구성돼 있습니다. 자세한 내용은 **[전처리 안내](docs/preprocessing.md)** 를 참고하세요.
 
 ### 파이프라인 흐름
 
@@ -98,19 +105,19 @@ Graduation-project/
 HotelRec.txt (47GB)
     │
     ├── 01_peek.py          스키마 미리보기 (콘솔 출력)
-    ├── 02_validate.py      전체 검증 통계  →  eda-alldata-output/validation_stats.json
-    ├── 03_sample.py        랜덤 샘플링     →  eda-alldata-output/sample_{k}.jsonl
-    ├── 04_filter_parquet.py  품질 필터링   →  eda-alldata-output/hotelrec_filtered.parquet
-    ├── 05_eda.py           전체 EDA 차트   →  eda-alldata-output/eda_*.png
-    ├── 06_normalize.py     정규화 + ID 매핑 → eda-alldata-output/hotelrec_normalized.parquet
-    ├── 07_kcore_filter.py  K-core 필터링   →  eda-alldata-output/hotelrec_kcore{k}.parquet
-    ├── 08_make_views.py    학습/검증 분할   →  eda-alldata-output/views/
-    ├── 09_geo_analysis.py  지역별 분포 분석 →  eda-alldata-output/geo_stats.csv + geo_*.png
+    ├── 02_validate.py      전체 검증 통계  →  reports/eda/all/validation_stats.json
+    ├── 03_sample.py        랜덤 샘플링     →  data/processed/sample_{k}.jsonl
+    ├── 04_filter_parquet.py  품질 필터링   →  data/processed/hotelrec_filtered.parquet
+    ├── 05_eda.py           전체 EDA 차트   →  reports/eda/all/eda_*.png
+    ├── 06_normalize.py     정규화 + ID 매핑 → data/processed/hotelrec_normalized.parquet
+    ├── 07_kcore_filter.py  K-core 필터링   →  data/processed/hotelrec_kcore{k}.parquet
+    ├── 08_make_views.py    학습/검증 분할   →  data/splits/
+    ├── 09_geo_analysis.py  지역별 분포 분석 →  reports/eda/all/geo_stats.csv + geo_*.png
     │
-    └── 10_extract_london.py  런던 추출     →  eda-london-output/london_reviews.json
+    └── 10_extract_london.py  런던 추출     →  data/processed/london_reviews.json
             │
-            ├── 11_london_eda.py   런던(46 geo) EDA  →  eda-london-output/london_eda_*.png
-            └── 12_g186338_eda.py  런던 중심부 EDA   →  eda-london-g186338-output/g186338_eda_*.png
+            ├── 11_london_eda.py   런던(46 geo) EDA  →  reports/eda/london/london_eda_*.png
+            └── 12_g186338_eda.py  런던 중심부 EDA   →  reports/eda/london_core/g186338_eda_*.png
 ```
 
 ### 스크립트 요약
@@ -136,7 +143,7 @@ HotelRec.txt (47GB)
 
 ## 출력 폴더 상세
 
-### eda-alldata-output/
+### reports/eda/all/
 
 전체 HotelRec 데이터를 처리한 결과물입니다.
 
@@ -151,22 +158,22 @@ HotelRec.txt (47GB)
 | `geo_top30_reviews.png` | 리뷰 수 Top 30 지역 |
 | `geo_top30_hotels.png` | 호텔 수 Top 30 지역 |
 | `geo_rating_top20.png` | 평균 평점 Top 20 지역 |
-| `*.parquet`, `*.jsonl`, `*.pkl`, `views/` | 중간 처리 파일 (git 미포함, 재생성 가능) |
+| `data/processed/`, `data/splits/` (별도 폴더) | 중간 처리 데이터 (대용량 파일은 Git 제외, 재생성 가능) |
 
-### eda-london-output/
+### reports/eda/london/
 
 런던 전체(46개 geo_id, 836,435건) EDA 결과입니다.
 
 | 파일 | 설명 |
 |------|------|
-| `london_reviews.json` | 런던 리뷰 전체 (769 MB, git 미포함) |
+| `data/processed/london_reviews.json` (별도 폴더) | 런던 리뷰 전체 (769 MB, Git 제외) |
 | `london_eda_rating_dist.png` | 평점 분포 |
 | `london_eda_text_length.png` | 텍스트 길이 히스토그램 |
 | `london_eda_year_dist.png` | 연도별 리뷰 수 |
 | `london_eda_sub_ratings.png` | 서브 평점 평균 |
 | `london_eda_top_hotels.png` | 리뷰 수 Top 20 호텔 |
 
-### eda-london-g186338-output/
+### reports/eda/london_core/
 
 런던 중심부(geo_id g186338 단독, 728,654건, 호텔 1,618개) EDA 결과입니다.
 
@@ -190,10 +197,10 @@ HotelRec.txt (47GB)
 python -m venv venv
 venv\Scripts\activate          # Windows
 pip install -r requirements.txt
-pip install duckdb             # scripts/07, 08, 09에 필요
+# duckdb 등 의존성은 requirements.txt에 포함
 ```
 
-`data/generate_profiles.py` 실행 시 `.env` 파일에 API 키가 필요합니다:
+`scripts/profiles/generate_profiles.py` 실행 시 `.env` 파일에 API 키가 필요합니다:
 
 ```
 LUXIA_API_KEY=your_api_key_here
@@ -207,26 +214,38 @@ LUXIA_API_KEY=your_api_key_here
 
 ```bash
 # 전체 데이터 EDA (약 7분)
-python scripts/05_eda.py --src raw
+python scripts/analysis/05_eda.py --src raw
 
 # 지역별 분포 분석 및 geo_stats.csv 생성 (약 7분)
-python scripts/09_geo_analysis.py --raw
+python scripts/analysis/09_geo_analysis.py --raw
 
 # 런던 리뷰 추출 (약 6분)
-python scripts/10_extract_london.py
+python scripts/preprocessing/10_extract_london.py
 
 # 런던 EDA
-python scripts/11_london_eda.py
-python scripts/12_g186338_eda.py
+python scripts/analysis/11_london_eda.py
+python scripts/analysis/12_g186338_eda.py
 ```
 
 
 ## Semantic ID 구현 및 다음 단계
 
 두 방식 모두 동일한 1,619개 호텔에 대해 4토큰 고유 ID를 생성했다.
-각 방식의 코드, 분석 그래프, 산출물은 `semantic_ids/` 아래에 분리해 보관한다.
+생성·분석 코드는 `scripts/`, 산출물은 `artifacts/`, 그래프는 `reports/`에 분리해 보관한다.
 
-- [Semantic ID 실행 및 산출물](semantic_ids/README.md)
+- [Semantic ID 실행 및 산출물](docs/semantic_ids/README.md)
 - [평가 메트릭 및 BM25·SASRec·BERT4Rec 실험 계획](docs/EXPERIMENT_PLAN.md)
 
 추천 모델 학습과 추천 성능 비교는 아직 수행하지 않았다.
+
+
+## 폴더 정리 원칙
+
+이번 정리는 파일 이동과 경로 수정에 한정한다. 기존 알고리즘, 모델 설정 및 분할 로직을 유지했다.
+`src` 패키지화와 공통 학습 진입점은 baseline 구현 단계에서 진행한다.
+현재 BM25·SASRec·BERT4Rec 모델은 구현되지 않았다.
+
+대용량 원본은 이 저장소에 들어 있지 않다. 원본은 `data/raw/`에 배치해야 하며,
+상위 `hotelrec_project/`에 남아 있는 파일은 이번 정리에서 이동하지 않았다.
+프로파일·ID·임베딩·체크포인트·그림은 기존 파일을 그대로 보존했다.
+새 대용량 모델 파일은 Git에서 제외하고, 기존에 추적 중인 산출물은 계속 유지한다.
