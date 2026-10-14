@@ -26,7 +26,7 @@ Graduation-project/
 │   └── preprocessing/logs/        # 기존 실행 기록
 ├── docs/                          # 전처리·Semantic ID·후속 실험 문서
 ├── archives/                      # 기존 scripts/files.zip 보관
-├── server/                        # 추천 서버 배포 (예정, Docker)
+├── server/                        # 추천 API 서버 (FastAPI + PostgreSQL, Docker Compose)
 ├── pyproject.toml, uv.lock        # uv 의존성 정의·고정 버전
 ├── .python-version                # Python 3.12
 └── README.md
