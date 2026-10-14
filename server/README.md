@@ -1,46 +1,43 @@
-# server/
+# 서버 공동 개발
 
-추천 결과를 제공하는 API 서버다. 현재는 FastAPI + PostgreSQL 기본 구성과 `/health` 엔드포인트만 있다.
+FastAPI + PostgreSQL 17 + Redis 7.4 개발 환경이다. Docker Desktop의 Linux 컨테이너 및 Docker Compose v2가 필요하다. Windows는 WSL 2 기반 Docker Desktop을 사용한다.
 
-- 학습·실험은 프로젝트 루트의 uv 환경에서 수행하고, 서버는 이 폴더 안에서 Docker로 빌드한다.
-- 서버 의존성은 이 폴더의 `pyproject.toml`·`uv.lock`으로 루트와 분리한다. 루트의 uv workspace에 넣지 않는다.
-- 서버가 `artifacts/`의 학습 산출물을 쓰게 되면 compose에 읽기 전용 볼륨으로 연결한다.
-  서버가 사용할 산출물 목록과 형식을 먼저 문서화한다.
+## 실행
 
-## 구성
+저장소 루트에서 실행한다 (Windows PowerShell / macOS 터미널 공통).
 
-| 파일 | 역할 |
-|---|---|
-| `compose.yaml` | 배포·공통 설정: `api`(FastAPI), `db`(PostgreSQL 17) |
-| `compose.override.yaml` | 로컬 개발용: 코드 마운트 + `--reload`, DB 포트 5432 노출 |
-| `Dockerfile` | `python:3.12-slim` + uv로 의존성 설치 |
-| `.env.example` | DB 계정·접속 정보 예시. 복사해서 `.env`로 사용 (Git 제외) |
-| `app/main.py` | FastAPI 앱. `GET /health`가 DB 연결까지 확인 |
-
-Redis, 모델 추론 서비스는 필요해질 때 `compose.yaml`에 서비스로 추가한다.
-
-## 로컬 실행
-
-```bash
-cd server
-cp .env.example .env              # 최초 1회
-docker compose up --build         # http://localhost:8000/health, 문서: /docs
-docker compose down               # 종료 (DB 데이터는 pgdata 볼륨에 유지)
-docker compose down -v            # DB 데이터까지 삭제
+```sh
+docker compose config --quiet
+docker compose up --build -d
+docker compose ps
 ```
 
-`app/` 코드를 수정하면 컨테이너가 자동으로 다시 시작된다.
-의존성 추가는 `server/`에서 `uv add <패키지>` 후 `docker compose up --build`로 이미지를 다시 만든다.
+- API 문서: http://localhost:8000/docs
+- 프로세스 상태: http://localhost:8000/health
+- PostgreSQL / Redis 연결 확인: http://localhost:8000/health/ready
+- React 개발 서버는 localhost:5173 또는 localhost:3000에서 별도 실행한다. 프론트엔드 코드는 아직 포함하지 않는다.
 
-Windows에서는 저장소를 WSL2 리눅스 파일시스템(`~/...`) 안에 클론해서 실행한다.
-`C:\` 아래에서 실행하면 파일 마운트가 느리고 `--reload`가 변경을 감지하지 못할 수 있다.
+`server/app/` 수정은 자동 반영된다. 서버 의존성을 변경하면 다시 `docker compose up --build -d`를 실행한다. 서버 requirements는 버전 범위이므로 빌드 시점에 따라 세부 버전이 달라질 수 있다.
 
-## 배포 (AWS)
-
-```bash
-docker compose -f compose.yaml up -d --build    # 개발용 override 제외
+```sh
+docker compose logs -f api
+docker compose exec db psql -U graduation -d graduation
+docker compose exec redis redis-cli ping
+docker compose down
 ```
 
-- Apple Silicon 맥에서 만든 이미지는 기본적으로 arm64다. x86 인스턴스에 올릴 이미지는
-  `docker build --platform linux/amd64`로 빌드하거나 서버에서 직접 빌드한다.
-- 배포 환경의 `.env`에는 `.env.example`과 다른 비밀번호를 사용한다.
+DB 사용자나 DB명을 변경했다면 psql 명령에도 같은 값을 사용한다. `down` 후에도 PostgreSQL 데이터는 named volume에 남는다. `docker compose down -v`는 DB 데이터를 삭제하므로 초기화할 때만 사용한다. Redis는 재생성 가능한 캐시로 사용하며 영구 보존하지 않는다.
+
+## 환경 변수
+
+루트 `.env.example`의 Docker 설정을 참고해 각자 루트 `.env`에 필요한 값만 추가한다. 기존 `.env`를 덮어쓰지 않는다. 기본값만으로 로컬 실행할 수 있다. `.env`와 API 키는 Git에 커밋하지 않는다. 루트 `.env` 전체를 API 컨테이너에 전달하지 않는다.
+
+API_PORT로 API 포트를 바꿀 수 있다. PostgreSQL과 Redis는 컨테이너 내부 네트워크에서만 접근한다. API도 호스트의 127.0.0.1에만 공개한다. 이 구성과 기본 비밀번호는 로컬 개발용이며 외부 배포 전 인증, 비밀값, TLS 등을 별도로 설정해야 한다.
+
+## 모델 학습과 연동
+
+모델 학습은 루트에서 기존 `uv sync --locked`, `uv run python scripts/...` 흐름을 사용한다. 서버 이미지에는 학습용 torch 의존성을 설치하지 않는다. `artifacts/`는 API의 `/app/artifacts`에 읽기 전용으로 연결한다. 추천 추론, 모델 로딩, DB 스키마 및 사용자 기능은 이후 구현한다.
+
+## 동료와 작업
+
+설정 파일을 Git으로 공유하고 각자 `git pull` 후 동일한 Compose 명령으로 실행한다. 컨테이너와 DB 데이터는 각자의 PC에 독립적으로 생성된다. 의존성 변경 시 재빌드하고, 모델 파일과 DB 데이터의 공유 방식은 별도로 합의한다.
