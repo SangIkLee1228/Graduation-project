@@ -26,7 +26,9 @@ Graduation-project/
 │   └── preprocessing/logs/        # 기존 실행 기록
 ├── docs/                          # 전처리·Semantic ID·후속 실험 문서
 ├── archives/                      # 기존 scripts/files.zip 보관
-├── requirements.txt
+├── server/                        # 추천 서버 배포 (예정, Docker)
+├── pyproject.toml, uv.lock        # uv 의존성 정의·고정 버전
+├── .python-version                # Python 3.12
 └── README.md
 ```
 
@@ -193,18 +195,32 @@ HotelRec.txt (47GB)
 
 ## 환경 설정
 
+[uv](https://docs.astral.sh/uv/)로 Python 버전(`.python-version`, 3.12)과 패키지 버전(`uv.lock`)을 고정합니다.
+macOS와 Windows 모두 같은 방법으로 설정합니다.
+
 ```bash
-python -m venv venv
-venv\Scripts\activate          # Windows
-pip install -r requirements.txt
-# duckdb 등 의존성은 requirements.txt에 포함
+# uv 설치 (최초 1회)
+curl -LsSf https://astral.sh/uv/install.sh | sh                          # macOS
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"   # Windows
+
+# 프로젝트 루트에서 환경 생성 (.venv/, Python 3.12 자동 설치)
+uv sync
+
+# 실행: 가상환경 활성화 없이 uv run 사용
+uv run python scripts/semantic_ids/rqvae/rqvae.py
 ```
 
-`scripts/profiles/generate_profiles.py` 실행 시 `.env` 파일에 API 키가 필요합니다:
+패키지를 추가할 때는 `pip install` 대신 `uv add <패키지>`를 사용하고, 변경된 `pyproject.toml`과 `uv.lock`을 함께 커밋합니다.
+아래 문서의 `python ...` 명령은 `uv run python ...`으로 실행하거나, `.venv`를 활성화한 뒤 실행합니다.
+
+`scripts/profiles/generate_profiles.py` 실행 시 `.env` 파일에 API 키가 필요합니다.
+`.env.example`을 `.env`로 복사한 뒤 키를 채웁니다. 키는 Git에 올리지 않습니다.
 
 ```
 LUXIA_API_KEY=your_api_key_here
 ```
+
+`data/raw/`의 원본 데이터는 Git에 포함되지 않으므로 팀 공유 폴더에서 받아 같은 위치에 둡니다.
 
 ---
 

@@ -15,10 +15,10 @@ K-means의 C4는 같은 3토큰 그룹 내 잔차 크기 순위(0~8), RQ-VAE의 
 
 ## 실행
 
-프로젝트 루트에서 의존성을 설치한 후 실행한다.
+프로젝트 루트에서 `uv sync`로 의존성을 설치한 후 실행한다. 아래 `python` 명령은 `uv run python`으로 실행해도 된다.
 
 ```bash
-pip install -r requirements.txt
+uv sync
 
 # K-means RQ
 python scripts/semantic_ids/rq_kmeans/build_semantic_ids_twkim.py

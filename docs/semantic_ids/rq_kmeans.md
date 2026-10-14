@@ -107,7 +107,7 @@ c4 = 1  →  두 번째
 python scripts/semantic_ids/rq_kmeans/build_semantic_ids_twkim.py
 ```
 
-의존성: `sentence-transformers`, `scikit-learn`, `numpy` (`requirements.txt` 참고)
+의존성: `sentence-transformers`, `scikit-learn`, `numpy` (`pyproject.toml` 참고)
 
 ## 참고 논문
 
