@@ -1,0 +1,409 @@
+[
+  {
+    "input": "/Users/twkim/Graduation-Project/hotelrec_data_preprocessing/data/hotelrec_geo_186338.json",
+    "reviews": 728655,
+    "hotels": 1619,
+    "author_identifiers": 585491,
+    "unique_user_hotel_edges": 688832,
+    "repeat_user_hotel_review_rows": 39823,
+    "unique_hotels_per_user_histogram": {
+      "1": 518597,
+      "2": 48284,
+      "3": 11132,
+      "4": 3791,
+      "5": 1626,
+      "6": 811,
+      "7": 480,
+      "8": 269,
+      "9": 176,
+      "10": 83,
+      "11": 62,
+      "12": 53,
+      "13": 40,
+      "14": 24,
+      "15": 12,
+      "16": 15,
+      "17": 9,
+      "18": 5,
+      "19": 3,
+      "20": 5,
+      "21": 3,
+      "22": 1,
+      "23": 2,
+      "24": 1,
+      "25": 1,
+      "31": 1,
+      "41": 1,
+      "45": 1,
+      "49": 1,
+      "195": 1,
+      "650": 1
+    },
+    "users_by_min_unique_hotels": {
+      "1": 585491,
+      "2": 66894,
+      "3": 18610,
+      "5": 3687,
+      "10": 325,
+      "20": 19
+    },
+    "users_with_at_least_3_distinct_review_timestamps": 19606,
+    "positive_rating_ge4_users_by_min_unique_hotels": {
+      "3": 10344,
+      "5": 1719,
+      "10": 109
+    },
+    "date_min": "2001-12-01T00:00:00",
+    "date_max": "2019-05-14T01:44:52",
+    "invalid_dates": 0,
+    "missing_fields": {},
+    "field_presence": {
+      "hotel_url": 728655,
+      "author": 728655,
+      "date": 728655,
+      "rating": 728655,
+      "title": 728655,
+      "text": 728655,
+      "property_dict": 728655
+    },
+    "rating_counts": {
+      "3.0": 95142,
+      "4.0": 212637,
+      "2.0": 45586,
+      "1.0": 52089,
+      "5.0": 323201
+    },
+    "year_counts": {
+      "2001": 1,
+      "2002": 84,
+      "2003": 686,
+      "2004": 2492,
+      "2005": 3267,
+      "2006": 5070,
+      "2007": 6880,
+      "2008": 7783,
+      "2009": 12291,
+      "2010": 16649,
+      "2011": 27770,
+      "2012": 48931,
+      "2013": 66703,
+      "2014": 81370,
+      "2015": 100647,
+      "2016": 115602,
+      "2017": 109937,
+      "2018": 92808,
+      "2019": 29684
+    },
+    "hotel_review_thresholds": {
+      "5": 1618,
+      "20": 1373,
+      "100": 947
+    },
+    "subratings": {
+      "service": {
+        "reviews": 519964,
+        "coverage": 0.7135942249761547,
+        "mean": 4.127558830995992
+      },
+      "cleanliness": {
+        "reviews": 391555,
+        "coverage": 0.5373667922404979,
+        "mean": 4.259943047592293
+      },
+      "value": {
+        "reviews": 391395,
+        "coverage": 0.5371472095847829,
+        "mean": 3.9111230342748375
+      },
+      "rooms": {
+        "reviews": 380299,
+        "coverage": 0.521919152410949,
+        "mean": 3.8891635265935487
+      },
+      "location": {
+        "reviews": 378791,
+        "coverage": 0.5198495858808352,
+        "mean": 4.482078507673097
+      },
+      "sleep quality": {
+        "reviews": 333365,
+        "coverage": 0.4575073251401555,
+        "mean": 4.0680035396637315
+      },
+      "check in / front desk": {
+        "reviews": 16015,
+        "coverage": 0.021978851445471452,
+        "mean": 3.662566344052451
+      },
+      "business service (e.g., internet access)": {
+        "reviews": 9543,
+        "coverage": 0.013096733021800441,
+        "mean": 3.370952530650739
+      },
+      "ur_question.prompt.11": {
+        "reviews": 6,
+        "coverage": 8.234349589311813e-06,
+        "mean": 3.8333333333333335
+      },
+      "userrating.prompt.190": {
+        "reviews": 5,
+        "coverage": 6.861957991093178e-06,
+        "mean": 4.0
+      }
+    },
+    "excluded_author_placeholders": {
+      "null": {
+        "distinct_hotels": 195
+      },
+      "/undefined": {
+        "distinct_hotels": 650
+      }
+    },
+    "usable_author_identifiers": 585489,
+    "usable_users_by_min_unique_hotels": {
+      "1": 585489,
+      "2": 66892,
+      "3": 18608,
+      "5": 3685,
+      "10": 323,
+      "20": 17
+    },
+    "usable_positive_users_by_min_unique_hotels": {
+      "3": 10342,
+      "5": 1717,
+      "10": 107
+    },
+    "unique_edge_kcore": {
+      "3": {
+        "users": 18386,
+        "hotels": 1199,
+        "unique_interactions": 71979,
+        "rounds": 3
+      },
+      "5": {
+        "users": 3236,
+        "hotels": 630,
+        "unique_interactions": 21163,
+        "rounds": 6
+      },
+      "10": {
+        "users": 0,
+        "hotels": 0,
+        "unique_interactions": 0,
+        "rounds": 4
+      }
+    },
+    "notes": [
+      "Author strings are unverified identity proxies.",
+      "Known literal author placeholders /undefined and null excluded from usable and k-core counts.",
+      "Repeat user-hotel rows are not necessarily duplicate reviews.",
+      "K-core uses unique edges, before any temporal train/test split.",
+      "Timestamp threshold alone does not guarantee distinct-hotel sequences.",
+      "Positive-user counts do not apply iterative item filtering."
+    ]
+  },
+  {
+    "input": "/Users/twkim/Graduation-Project/hotelrec_data_preprocessing/output/london_reviews.json",
+    "reviews": 841147,
+    "hotels": 1935,
+    "author_identifiers": 663774,
+    "unique_user_hotel_edges": 793975,
+    "repeat_user_hotel_review_rows": 47172,
+    "unique_hotels_per_user_histogram": {
+      "1": 581797,
+      "2": 58026,
+      "3": 13952,
+      "4": 4994,
+      "5": 2177,
+      "6": 1081,
+      "7": 643,
+      "8": 368,
+      "9": 258,
+      "10": 142,
+      "11": 78,
+      "12": 66,
+      "13": 50,
+      "14": 38,
+      "15": 22,
+      "16": 15,
+      "17": 15,
+      "18": 13,
+      "19": 9,
+      "20": 5,
+      "21": 7,
+      "22": 2,
+      "23": 4,
+      "24": 4,
+      "25": 1,
+      "26": 1,
+      "31": 1,
+      "47": 1,
+      "49": 1,
+      "52": 1,
+      "229": 1,
+      "736": 1
+    },
+    "users_by_min_unique_hotels": {
+      "1": 663774,
+      "2": 81977,
+      "3": 23951,
+      "5": 5005,
+      "10": 478,
+      "20": 30
+    },
+    "users_with_at_least_3_distinct_review_timestamps": 24768,
+    "positive_rating_ge4_users_by_min_unique_hotels": {
+      "3": 13297,
+      "5": 2355,
+      "10": 164
+    },
+    "date_min": "2001-12-01T00:00:00",
+    "date_max": "2019-05-14T01:44:52",
+    "invalid_dates": 0,
+    "missing_fields": {},
+    "field_presence": {
+      "hotel_url": 841147,
+      "author": 841147,
+      "date": 841147,
+      "rating": 841147,
+      "title": 841147,
+      "text": 841147,
+      "property_dict": 841147
+    },
+    "rating_counts": {
+      "3.0": 112063,
+      "4.0": 246890,
+      "2.0": 53868,
+      "1.0": 61657,
+      "5.0": 366669
+    },
+    "year_counts": {
+      "2001": 1,
+      "2002": 85,
+      "2003": 712,
+      "2004": 2586,
+      "2005": 3424,
+      "2006": 5396,
+      "2007": 7369,
+      "2008": 8391,
+      "2009": 13334,
+      "2010": 18437,
+      "2011": 31152,
+      "2012": 54550,
+      "2013": 75201,
+      "2014": 92738,
+      "2015": 116269,
+      "2016": 134982,
+      "2017": 129031,
+      "2018": 111635,
+      "2019": 35854
+    },
+    "hotel_review_thresholds": {
+      "5": 1935,
+      "20": 1658,
+      "100": 1116
+    },
+    "subratings": {
+      "service": {
+        "reviews": 596603,
+        "coverage": 0.7092731710390693,
+        "mean": 4.1130131762662945
+      },
+      "cleanliness": {
+        "reviews": 448349,
+        "coverage": 0.5330209820637772,
+        "mean": 4.249950373481373
+      },
+      "value": {
+        "reviews": 448162,
+        "coverage": 0.5327986665826544,
+        "mean": 3.9100704655905676
+      },
+      "rooms": {
+        "reviews": 435446,
+        "coverage": 0.517681213866304,
+        "mean": 3.8914790812178777
+      },
+      "location": {
+        "reviews": 434218,
+        "coverage": 0.516221302578503,
+        "mean": 4.449039422594181
+      },
+      "sleep quality": {
+        "reviews": 384012,
+        "coverage": 0.4565337568819719,
+        "mean": 4.061862650125517
+      },
+      "check in / front desk": {
+        "reviews": 17201,
+        "coverage": 0.02044945770477693,
+        "mean": 3.6427533282948668
+      },
+      "business service (e.g., internet access)": {
+        "reviews": 10160,
+        "coverage": 0.0120787448567254,
+        "mean": 3.354035433070866
+      },
+      "ur_question.prompt.11": {
+        "reviews": 6,
+        "coverage": 7.133117041373268e-06,
+        "mean": 3.8333333333333335
+      },
+      "userrating.prompt.190": {
+        "reviews": 5,
+        "coverage": 5.9442642011443895e-06,
+        "mean": 4.0
+      }
+    },
+    "excluded_author_placeholders": {
+      "null": {
+        "distinct_hotels": 229
+      },
+      "/undefined": {
+        "distinct_hotels": 736
+      }
+    },
+    "usable_author_identifiers": 663772,
+    "usable_users_by_min_unique_hotels": {
+      "1": 663772,
+      "2": 81975,
+      "3": 23949,
+      "5": 5003,
+      "10": 476,
+      "20": 28
+    },
+    "usable_positive_users_by_min_unique_hotels": {
+      "3": 13295,
+      "5": 2353,
+      "10": 162
+    },
+    "unique_edge_kcore": {
+      "3": {
+        "users": 23714,
+        "hotels": 1493,
+        "unique_interactions": 94258,
+        "rounds": 3
+      },
+      "5": {
+        "users": 4477,
+        "hotels": 819,
+        "unique_interactions": 29678,
+        "rounds": 5
+      },
+      "10": {
+        "users": 0,
+        "hotels": 0,
+        "unique_interactions": 0,
+        "rounds": 5
+      }
+    },
+    "notes": [
+      "Author strings are unverified identity proxies.",
+      "Known literal author placeholders /undefined and null excluded from usable and k-core counts.",
+      "Repeat user-hotel rows are not necessarily duplicate reviews.",
+      "K-core uses unique edges, before any temporal train/test split.",
+      "Timestamp threshold alone does not guarantee distinct-hotel sequences.",
+      "Positive-user counts do not apply iterative item filtering."
+    ]
+  }
+]

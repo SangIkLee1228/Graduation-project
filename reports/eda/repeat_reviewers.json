@@ -1,0 +1,42 @@
+[
+  {
+    "input": "/Users/twkim/Graduation-Project/hotelrec_data_preprocessing/data/hotelrec_geo_186338.json",
+    "valid_author_identifiers": 585489,
+    "valid_reviews": 707149,
+    "users_with_at_least_2_reviews": 75233,
+    "multiple_review_user_percent": 12.849600931870624,
+    "users_with_at_least_2_distinct_hotels": 66892,
+    "multiple_reviews_but_only_one_hotel": 8341,
+    "users_by_min_reviews": {
+      "2": 75233,
+      "3": 22810,
+      "5": 4981,
+      "10": 554
+    },
+    "excluded_author_review_rows": {
+      "/undefined": 21202,
+      "null": 304
+    },
+    "method": "Exact author string grouping; real identity not independently verified."
+  },
+  {
+    "input": "/Users/twkim/Graduation-Project/hotelrec_data_preprocessing/output/london_reviews.json",
+    "valid_author_identifiers": 663772,
+    "valid_reviews": 815858,
+    "users_with_at_least_2_reviews": 91432,
+    "multiple_review_user_percent": 13.774609353814261,
+    "users_with_at_least_2_distinct_hotels": 81975,
+    "multiple_reviews_but_only_one_hotel": 9457,
+    "users_by_min_reviews": {
+      "2": 91432,
+      "3": 28846,
+      "5": 6604,
+      "10": 773
+    },
+    "excluded_author_review_rows": {
+      "/undefined": 24939,
+      "null": 350
+    },
+    "method": "Exact author string grouping; real identity not independently verified."
+  }
+]
