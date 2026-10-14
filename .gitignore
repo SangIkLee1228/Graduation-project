@@ -23,3 +23,7 @@ __pycache__/
 .ipynb_checkpoints/
 .env
 .DS_Store
+
+# 프론트엔드
+node_modules/
+frontend/dist/

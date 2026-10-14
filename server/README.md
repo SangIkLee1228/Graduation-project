@@ -15,7 +15,7 @@ docker compose ps
 - API 문서: http://localhost:8000/docs
 - 프로세스 상태: http://localhost:8000/health
 - PostgreSQL / Redis 연결 확인: http://localhost:8000/health/ready
-- React 개발 서버는 localhost:5173 또는 localhost:3000에서 별도 실행한다. 프론트엔드 코드는 아직 포함하지 않는다.
+- React 개발 서버는 localhost:5173 또는 localhost:3000에서 별도 실행한다. 프론트엔드 목업은 `frontend/`에 있다 (아직 API와 연결하지 않음).
 
 `server/app/` 수정은 자동 반영된다. 서버 의존성을 변경하면 다시 `docker compose up --build -d`를 실행한다. 서버 requirements는 버전 범위이므로 빌드 시점에 따라 세부 버전이 달라질 수 있다.
 
