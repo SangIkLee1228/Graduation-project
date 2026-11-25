@@ -139,12 +139,14 @@ class Catalog:
         hotels = [Hotel.model_validate(row) for row in payload["hotels"]]
         return cls(hotels)
 
-    def search(self, preferences: list[Preference]) -> list[Candidate]:
+    def search(self, preferences: list[Preference], excluded_hotel_ids: set[str] | None = None) -> list[Candidate]:
         filters = [(preference, match_patterns(preference)) for preference in preferences]
         query = {word for preference in preferences if preference.mode != "excluded"
                  for term in preference.terms for word in tokens(term)}
         candidates = []
         for hotel in self.hotels.values():
+            if excluded_hotel_ids and hotel.id in excluded_hotel_ids:
+                continue
             evidence = {}
             for preference, patterns in filters:
                 sentences = self.sentences[hotel.id]
