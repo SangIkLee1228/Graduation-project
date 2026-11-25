@@ -1,65 +1,110 @@
 import { useEffect, useRef, useState } from 'react'
 import { track } from '../lib/analytics.js'
-import { searchHotels } from '../lib/search.js'
 import { Sid, Thumb } from './common.jsx'
 
-const TOP_N = 3
 const GREETING = {
   role: 'agent',
-  text: '안녕하세요! 원하는 런던 숙소를 편하게 말로 설명해 주세요. 지역, 분위기, 예산 등을 함께 말해 주시면 더 잘 찾아요.',
+  text: '어떤 런던 숙소를 찾으세요? 원하는 지역, 분위기, 숙소 유형이나 편의시설을 말해 주세요.',
 }
 
-// 데모 에이전트: 키워드 매칭으로 응답을 흉내 낸다. 모델 API가 생기면 reply()만 서버 호출로 바꾼다.
-function reply(hotels, query) {
-  const { concepts, results } = searchHotels(hotels, query)
-  const top = results.slice(0, TOP_N)
-  if (!top.length) {
-    const known = concepts.length && concepts.some((c) => c.ko.length)
-    return {
-      role: 'agent',
-      text: known
-        ? '조건에 모두 맞는 호텔을 찾지 못했어요. 조건을 줄여서 다시 말씀해 주세요.'
-        : '아직 이해하지 못한 표현이에요. 지역(하이드파크, 킹스크로스 등)이나 분위기(조용한, 가성비, 부티크 등)로 말씀해 주세요.',
-    }
-  }
-  const labels = concepts.map((c) => c.label).join(', ')
-  let text = `'${labels}' 조건에 맞는 호텔 ${results.length.toLocaleString()}곳 중, 조건이 가장 많이 맞고 평점·리뷰 수가 좋은 ${top.length}곳을 골랐어요.`
-  if (top.some((r) => r.hotel.warn)) text += ' ⚠ 표시는 최근 1년 평점이 떨어진 곳이에요.'
-  return { role: 'agent', text, query, picks: top }
+const ERROR_MESSAGES = {
+  conversation_expired: '대화가 만료됐어요. 새 대화를 시작해 주세요.',
+  conversation_conflict: '대화가 업데이트되는 중이에요. 다시 시도해 주세요.',
+  llm_not_configured: '추천 서비스를 사용하려면 서버에 Luxia API 키를 설정해 주세요.',
+  llm_unavailable: '조건을 해석하지 못했어요. 다시 시도해 주세요.',
+  conversation_store_unavailable: '대화를 저장할 수 없어요. 잠시 후 다시 시도해 주세요.',
 }
 
-export default function ChatWidget({ hotels, examples, onOpen, onShowAll }) {
+function ChatPick({ hotel, onOpen, onBook }) {
+  return (
+    <article className="chat-pick">
+      <button className="pick" onClick={onOpen}>
+        <Thumb hotel={hotel} size="sm" />
+        <span className="pick-info">
+          <span className="pick-name">{hotel.name}</span>
+          <span className="muted">★ {hotel.rating.toFixed(1)} · <Sid sid={hotel.sid} /></span>
+        </span>
+      </button>
+      <p className="pick-reason">{hotel.reason}</p>
+      <div className="pick-links">
+        {hotel.booking_links.map((link) => (
+          <a key={link.platform} href={link.href} target="_blank" rel="noreferrer"
+            onClick={() => onBook(link.platform)}>{link.label}</a>
+        ))}
+      </div>
+    </article>
+  )
+}
+
+export default function ChatWidget({ examples, onOpen, onBook }) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([GREETING])
   const [input, setInput] = useState('')
+  const [conversation, setConversation] = useState(null)
+  const [preferences, setPreferences] = useState([])
   const [typing, setTyping] = useState(false)
+  const [failure, setFailure] = useState(null)
+  const inFlight = useRef(false)
   const endRef = useRef(null)
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' })
-  }, [messages, typing, open])
+  }, [messages, typing, failure, open])
 
   const toggle = () => {
     if (!open) track('chat_opened')
     setOpen(!open)
   }
 
-  const send = (text) => {
-    const query = text.trim()
-    if (!query || typing) return
-    track('chat_message_sent', { query })
-    setMessages((m) => [...m, { role: 'user', text: query }])
+  const reset = () => {
+    if (inFlight.current) return
+    setMessages([GREETING])
+    setPreferences([])
+    setConversation(null)
     setInput('')
+    setFailure(null)
+  }
+
+  const submit = async (body) => {
+    inFlight.current = true
+    setFailure(null)
     setTyping(true)
-    setTimeout(() => {
-      setMessages((m) => [...m, reply(hotels, query)])
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        setFailure({ code: data.detail, body })
+        return
+      }
+      setConversation(data.conversation_id)
+      setPreferences(data.preferences)
+      setMessages((current) => [...current, {
+        role: 'agent', text: data.reply, picks: data.recommendations,
+      }])
+    } catch {
+      setFailure({ body })
+    } finally {
       setTyping(false)
-    }, 600)
+      inFlight.current = false
+    }
+  }
+
+  const send = (text) => {
+    const message = text.trim()
+    if (!message || inFlight.current || failure) return
+    track('chat_message_sent')
+    setMessages((current) => [...current, { role: 'user', text: message }])
+    setInput('')
+    void submit({ message, request_id: crypto.randomUUID(), conversation_id: conversation })
   }
 
   const pick = (hotel, rank) => {
     track('chat_recommendation_clicked', { hotel_id: hotel.id, rank })
-    onOpen(hotel, 'chat')
+    onOpen(hotel.id)
   }
 
   return (
@@ -67,49 +112,65 @@ export default function ChatWidget({ hotels, examples, onOpen, onShowAll }) {
       {open && (
         <section className="chat-panel" aria-label="추천 에이전트">
           <header className="chat-head">
-            <div>
-              <strong>Talk to Book 에이전트</strong>
-              <span className="badge badge-demo">데모</span>
+            <strong>Talk to Book 에이전트</strong>
+            <div className="chat-head-actions">
+              <button className="chat-reset" onClick={reset} disabled={typing}>새 대화</button>
+              <button className="chat-close" onClick={toggle} aria-label="닫기">×</button>
             </div>
-            <button className="chat-close" onClick={toggle} aria-label="닫기">×</button>
           </header>
 
-          <div className="chat-body">
-            {messages.map((m, i) => (
-              <div key={i} className={`msg msg-${m.role}`}>
-                <p>{m.text}</p>
-                {m.picks?.map(({ hotel, matched }, rank) => (
-                  <button key={hotel.id} className="pick" onClick={() => pick(hotel, rank + 1)}>
-                    <Thumb hotel={hotel} size="sm" />
-                    <span className="pick-info">
-                      <span className="pick-name">{hotel.warn && '⚠ '}{hotel.name}</span>
-                      <span className="muted">★ {hotel.rating.toFixed(1)} · <Sid sid={hotel.sid} /></span>
-                      <span className="pick-matched">✓ {matched.map((c) => c.label).join(' · ')}</span>
-                    </span>
-                  </button>
+          {preferences.length > 0 && (
+            <div className="chat-preferences" aria-label="적용 중인 조건">
+              <span>적용 중인 조건</span>
+              {preferences.map(({ label, mode }) => (
+                <span className="chip chip-match" key={label}>
+                  {mode === 'excluded' ? '제외 · ' : mode === 'required' ? '필수 · ' : ''}{label}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="chat-body" role="log" aria-label="대화">
+            {messages.map((message, index) => (
+              <div key={index} className={`msg msg-${message.role}`}>
+                <p>{message.text}</p>
+                {message.picks?.map((hotel, rank) => (
+                  <ChatPick key={hotel.id} hotel={hotel} onOpen={() => pick(hotel, rank + 1)}
+                    onBook={(platform) => onBook(hotel, platform, 'chat')} />
                 ))}
-                {m.picks && (
-                  <button className="link-btn" onClick={() => onShowAll(m.query)}>목록에서 전체 결과 보기 →</button>
-                )}
               </div>
             ))}
             {messages.length === 1 && (
               <div className="chat-examples">
-                {examples.map((ex) => <button key={ex} className="chip" onClick={() => send(ex)}>{ex}</button>)}
+                {examples.map((example) => (
+                  <button key={example} className="chip" onClick={() => send(example)}>{example}</button>
+                ))}
               </div>
             )}
-            {typing && <div className="msg msg-agent typing"><span /><span /><span /></div>}
+            {typing && <p className="msg msg-agent" role="status">조건을 확인하고 있어요…</p>}
+            {failure && (
+              <div className="msg msg-agent">
+                <p role="alert">{ERROR_MESSAGES[failure.code] ?? '응답을 받지 못했어요. 다시 시도해 주세요.'}</p>
+                {failure.code !== 'conversation_expired' && (
+                  <button className="btn btn-ghost" onClick={() => {
+                    if (!inFlight.current) void submit(failure.body)
+                  }}>다시 시도</button>
+                )}
+              </div>
+            )}
             <div ref={endRef} />
           </div>
 
-          <form className="chat-input" onSubmit={(e) => { e.preventDefault(); send(input) }}>
-            <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="예: 하이드파크 근처 조용한 호텔" />
-            <button className="btn btn-primary" disabled={!input.trim() || typing}>전송</button>
+          <form className="chat-input" onSubmit={(event) => { event.preventDefault(); send(input) }}>
+            <input value={input} onChange={(event) => setInput(event.target.value)} maxLength={1000}
+              aria-label="숙소 추천 메시지" placeholder="예: 조용한 곳으로 바꿔줘" disabled={typing || Boolean(failure)} />
+            <button className="btn btn-primary" disabled={!input.trim() || typing || Boolean(failure)}>전송</button>
           </form>
-          <p className="chat-note">키워드 매칭으로 만든 데모 응답이에요. 추천 모델은 아직 연결되지 않았어요.</p>
+          <p className="chat-note">과거 리뷰를 사용합니다. 요금과 예약 가능 여부는 예약 사이트에서 확인하세요.</p>
         </section>
       )}
-      <button className="chat-fab" onClick={toggle} aria-label={open ? '에이전트 닫기' : '에이전트에게 물어보기'}>
+      <button className="chat-fab" onClick={toggle} aria-expanded={open}
+        aria-label={open ? '에이전트 닫기' : '숙소 추천받기'}>
         {open ? '×' : '숙소 추천받기'}
       </button>
     </div>

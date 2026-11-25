@@ -37,6 +37,7 @@ export default function App() {
   }, [])
 
   const search = useMemo(() => (data && query ? searchHotels(data.hotels, query) : null), [data, query])
+  const hotelsById = useMemo(() => new Map(data?.hotels.map((hotel) => [hotel.id, hotel])), [data])
 
   const base = useMemo(() => {
     if (!data) return []
@@ -78,18 +79,18 @@ export default function App() {
       <header className="topbar">
         <div className="container topbar-inner">
           <button className="logo" onClick={() => runSearch('', 'logo')}>Talk to Book</button>
-          <span className="muted">런던 호텔 추천 <span className="badge badge-demo">데모</span></span>
+          <span className="muted">런던 호텔 추천</span>
         </div>
       </header>
 
       <section className="hero">
         <div className="container">
           <h1>말로 찾는 런던 호텔</h1>
-          <p className="hero-sub">TripAdvisor 리뷰 72만 건을 요약한 호텔 1,619곳 · Semantic ID 기반 추천</p>
+          <p className="hero-sub">호텔 1,619곳을 둘러보거나 추천 에이전트에 원하는 숙소를 물어보세요.</p>
           <form className="searchbar" onSubmit={(e) => { e.preventDefault(); runSearch(input, 'searchbar') }}>
             <input value={input} onChange={(e) => setInput(e.target.value)}
-              placeholder="어떤 숙소를 찾으세요? 예: 하이드파크 근처 조용한 부티크 호텔" aria-label="호텔 검색" />
-            <button className="btn btn-primary" disabled={!data}>검색</button>
+              placeholder="호텔 목록 검색 · 예: 하이드파크 근처 조용한 부티크 호텔" aria-label="호텔 목록 검색" />
+            <button className="btn btn-primary" disabled={!data}>목록 검색</button>
           </form>
           <div className="examples">
             {EXAMPLES.map((ex) => (
@@ -164,8 +165,10 @@ export default function App() {
       </footer>
 
       {data && (
-        <ChatWidget hotels={data.hotels} examples={EXAMPLES.slice(0, 3)} onOpen={openHotel}
-          onShowAll={(q) => runSearch(q, 'chat')} />
+        <ChatWidget examples={EXAMPLES.slice(0, 3)} onBook={book} onOpen={(id) => {
+          const hotel = hotelsById.get(id)
+          if (hotel) openHotel(hotel, 'chat')
+        }} />
       )}
       {selected && (
         <HotelModal hotel={selected} hotels={data.hotels} recentSince={data.meta.recent_since}

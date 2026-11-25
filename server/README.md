@@ -15,7 +15,7 @@ docker compose ps
 - API 문서: http://localhost:8000/docs
 - 프로세스 상태: http://localhost:8000/health
 - PostgreSQL / Redis 연결 확인: http://localhost:8000/health/ready
-- React 개발 서버는 localhost:5173 또는 localhost:3000에서 별도 실행한다. 프론트엔드 목업은 `frontend/`에 있다 (아직 API와 연결하지 않음).
+- React 개발 서버 실행은 [프런트엔드 안내](../frontend/README.md)를 참고한다. Vite는 `/api` 요청을 FastAPI로 프록시한다.
 
 `server/app/` 수정은 자동 반영된다. 서버 의존성을 변경하면 다시 `docker compose up --build -d`를 실행한다. 서버 requirements는 버전 범위이므로 빌드 시점에 따라 세부 버전이 달라질 수 있다.
 
@@ -30,13 +30,23 @@ DB 사용자나 DB명을 변경했다면 psql 명령에도 같은 값을 사용�
 
 ## 환경 변수
 
-루트 `.env.example`의 Docker 설정을 참고해 각자 루트 `.env`에 필요한 값만 추가한다. 기존 `.env`를 덮어쓰지 않는다. 기본값만으로 로컬 실행할 수 있다. `.env`와 API 키는 Git에 커밋하지 않는다. 루트 `.env` 전체를 API 컨테이너에 전달하지 않는다.
+루트 `.env.example`에 있는 변수 중 필요한 값만 루트 `.env`에 추가한다. 대화 추천에 필요한 `LUXIA_API_KEY`는 서버 컨테이너에 전달된다. 키를 나중에 추가한 경우 루트에서 `docker compose up -d api`로 설정을 반영한다. 키가 비어 있으면 카탈로그 탐색과 상태 확인을 사용할 수 있고, 대화 API는 `503 llm_not_configured`를 반환한다.
 
 API_PORT로 API 포트를 바꿀 수 있다. PostgreSQL과 Redis는 컨테이너 내부 네트워크에서만 접근한다. API도 호스트의 127.0.0.1에만 공개한다. 이 구성과 기본 비밀번호는 로컬 개발용이며 외부 배포 전 인증, 비밀값, TLS 등을 별도로 설정해야 한다.
 
-## 모델 학습과 연동
+## 대화 추천
 
-모델 학습은 루트에서 기존 `uv sync --locked`, `uv run python scripts/...` 흐름을 사용한다. 서버 이미지에는 학습용 torch 의존성을 설치하지 않는다. `artifacts/`는 API의 `/app/artifacts`에 읽기 전용으로 연결한다. 추천 추론, 모델 로딩, DB 스키마 및 사용자 기능은 이후 구현한다.
+`POST /api/chat`에는 메시지와 요청마다 고유한 UUID v4인 `request_id`를 보낸다. 다음 턴부터는 응답의 `conversation_id`도 보낸다. 응답에는 적용된 조건, 답변, 호텔 카드 최대 3개가 들어 있다. 네트워크 실패 후에는 같은 요청 ID와 본문으로 재시도한다. 만료된 대화는 `404 conversation_expired`, 동시에 갱신된 대화는 `409 conversation_conflict`로 응답한다.
+
+서버는 최근 12개 대화 메시지와 현재 조건을 Redis에 보관한다. 대화는 마지막 성공 요청 이후 24시간에 만료되며, 각 성공 요청은 24시간 동안 재전송할 수 있다. Luxia Cloud에는 조건 해석용 메시지와 최근 문맥, 추천 이유에 필요한 호텔 프로파일을 전송한다.
+
+기존 호텔 JSON을 읽기 전용으로 마운트한다. 추천 서비스는 BM25로 후보를 찾은 다음 K-means Semantic ID의 공통 접두사로 재정렬한다. 호텔 정보와 외부 링크는 카탈로그에서 구성한다.
+
+## 테스트와 모델 학습
+
+저장소 루트에서 서버 의존성을 설치한 Python 환경으로 `python -m unittest discover -s server/tests -v`를 실행한다. 테스트용 Redis가 있으면 `TEST_REDIS_URL`을 지정하여 API·Redis 통합 테스트도 실행한다. 테스트는 모의 LLM을 사용한다.
+
+모델 학습은 루트에서 기존 `uv sync --locked`, `uv run python scripts/...` 흐름을 사용한다. 서버 이미지에는 학습용 torch 의존성을 설치하지 않는다. `artifacts/`는 API의 `/app/artifacts`에 읽기 전용으로 연결한다.
 
 ## 동료와 작업
 

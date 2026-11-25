@@ -12,11 +12,14 @@ services:
       PGUSER: ${POSTGRES_USER:-graduation}
       PGPASSWORD: ${POSTGRES_PASSWORD:-local-dev-only}
       REDIS_URL: redis://redis:6379/0
+      LUXIA_API_KEY: ${LUXIA_API_KEY:-}
+      HOTEL_CATALOG_PATH: /app/catalog/hotels.json
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:3000}
       WATCHFILES_FORCE_POLLING: "true"
     volumes:
       - ./server/app:/app/app
       - ./artifacts:/app/artifacts:ro
+      - ./frontend/public/data/hotels.json:/app/catalog/hotels.json:ro
     depends_on:
       db:
         condition: service_healthy
